@@ -9,7 +9,7 @@ class ScreenShotBot(Client):
 
     def __init__(self):
         super().__init__(
-            name=Config.BOT_NAME,
+            name=Config.NAME,
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,
             bot_token=Config.BOT_TOKEN,
