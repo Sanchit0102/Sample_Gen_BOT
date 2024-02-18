@@ -1,3 +1,5 @@
+#(©) 𝚂𝙰𝙽𝙲𝙷𝙸𝚃 ♛⛧
+
 import time
 
 from pyrogram import filters as  Filters
@@ -20,14 +22,14 @@ async def _(c, m):
 
 async def foo(c, m, chat_id, cb=False):
     if not c.CHAT_FLOOD.get(chat_id):
-        c.CHAT_FLOOD[chat_id] = int(time.time()) - Config.SLOW_SPEED_DELAY-1
+        c.CHAT_FLOOD[chat_id] = time.time() - Config.SLOW_SPEED_DELAY-1
 
-    if int(time.time()) - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
+    if time.time() - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
         if cb:
             await m.answer()
         return
 
-    c.CHAT_FLOOD[chat_id] = int(time.time())
+    c.CHAT_FLOOD[chat_id] = time.time()
 
     if not await c.db.is_user_exist(chat_id):
         await c.db.add_user(chat_id)
