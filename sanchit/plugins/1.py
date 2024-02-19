@@ -14,10 +14,11 @@ async def __(c, m):
     await foo(c, m, chat_id, cb=True)
 
 
-@ScreenShotBot.on_message(Filters.private)
-async def _(c, m):
-    chat_id = m.chat.id
-    await foo(c, m, chat_id)
+@ScreenShotBot.on_message(filters.private)
+async def _(client, message):
+    chat_id = message.chat.id
+    await foo(client, message, chat_id)
+
 
 
 async def foo(c, m, chat_id, cb=False):
