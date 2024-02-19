@@ -14,7 +14,7 @@ async def __(c, m):
     await foo(c, m, chat_id, cb=True)
 
 
-@ScreenShotBot.on_message(Filters.private)
+@ScreenShotBot.on_message(Filters.private, message)
 async def _(client, message):
     chat_id = message.chat.id
     await foo(client, message, chat_id)
