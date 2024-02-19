@@ -1,7 +1,7 @@
 #(©) 𝚂𝙰𝙽𝙲𝙷𝙸𝚃 ♛⛧
 
 import time
-from pyrogram import message
+from pyrogram.types import Message
 from pyrogram import filters as  Filters
 
 from ..screenshotbot import ScreenShotBot
