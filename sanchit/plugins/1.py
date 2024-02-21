@@ -1,49 +1,55 @@
 #(©) 𝚂𝙰𝙽𝙲𝙷𝙸𝚃 ♛⛧
 
 import time
-from pyrogram.types import Message
-from pyrogram import filters as  Filters
+import datetime
 
-from ..screenshotbot import ScreenShotBot
-from ..config import Config
+from pyrogram import filters
+
+from sanchit.screenshotbot import ScreenShotBot
+from sanchit.config import Config
+from sanchit.database import Database
+
+
+db = Database()
 
 
 @ScreenShotBot.on_callback_query()
 async def __(c, m):
+    await foo(c, m, cb=True)
+
+
+@ScreenShotBot.on_message(filters.private)
+async def _(c, m):
+    await foo(c, m)
+
+
+async def foo(c, m, cb=False):
     chat_id = m.from_user.id
-    await foo(c, m, chat_id, cb=True)
-
-
-@ScreenShotBot.on_message(Filters.private, message)
-async def _(client, message):
-    chat_id = message.chat.id
-    await foo(client, message, chat_id)
-
-
-
-async def foo(c, m, chat_id, cb=False):
-    if not c.CHAT_FLOOD.get(chat_id):
-        c.CHAT_FLOOD[chat_id] = time.time() - Config.SLOW_SPEED_DELAY-1
-
-    if time.time() - c.CHAT_FLOOD.get(chat_id) < Config.SLOW_SPEED_DELAY:
+    if int(time.time()) - c.CHAT_FLOOD[chat_id] < Config.SLOW_SPEED_DELAY:
         if cb:
-            await m.answer()
+            try:
+                await m.answer()
+            except Exception:
+                pass
         return
 
-    c.CHAT_FLOOD[chat_id] = time.time()
+    c.CHAT_FLOOD[chat_id] = int(time.time())
 
-    if not await c.db.is_user_exist(chat_id):
-        await c.db.add_user(chat_id)
-        await c.send_message(
-            Config.LOG_CHANNEL,
-            f"New User {m.from_user.mention}."
-        )
+    if not await db.is_user_exist(chat_id):
+        await db.add_user(chat_id)
+        await c.send_message(Config.LOG_CHANNEL, f"New User {m.from_user.mention}.")
 
-    ban_status = await c.db.get_ban_status(chat_id)
-    if ban_status['is_banned']:
-        if (datetime.date.today() - datetime.date.fromisoformat(ban_status['banned_on'])).days > ban_status['ban_duration']:
-            await c.db.remove_ban(chat_id)
+    ban_status = await db.get_ban_status(chat_id)
+    if ban_status["is_banned"]:
+        if (
+            datetime.date.today() - datetime.date.fromisoformat(ban_status["banned_on"])
+        ).days > ban_status["ban_duration"]:
+            await db.remove_ban(chat_id)
         else:
             return
+
+    last_used_on = await db.get_last_used_on(chat_id)
+    if last_used_on != datetime.date.today().isoformat():
+        await db.update_last_used_on(chat_id)
 
     await m.continue_propagation()
